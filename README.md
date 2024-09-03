@@ -11,3 +11,17 @@ Note that this is NOT a replacement for tools like [dagster](https://github.com/
 - Easiest-possible DAG that keeps track of the run status of all tasks and their relationships.
 - Highly-configurable commands for execution of the DAG, including running a task in isolation, running only upstream tasks, or running only downstream tasks, etc.
 - All configurations managed natively in python -- users don't need to mess with yaml or json files.
+
+## Development
+
+First install `pyenv`. Then:
+```
+pyenv install 3.11.4
+pyenv global 3.11.4
+# install poetry:
+curl -sSL https://install.python-poetry.org | python3 -
+poetry init
+poetry add --dev ruff pyright pytest
+poetry export -f requirements.txt --output requirements.txt --without-hashes
+
+```
