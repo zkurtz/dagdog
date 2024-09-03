@@ -20,8 +20,6 @@ pyenv install 3.11.4
 pyenv global 3.11.4
 # install poetry:
 curl -sSL https://install.python-poetry.org | python3 -
-poetry init
 poetry add --dev ruff pyright pytest
 poetry export -f requirements.txt --output requirements.txt --without-hashes
-
 ```
