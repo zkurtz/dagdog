@@ -24,10 +24,6 @@ nodes = [
 dog = Dog(nodes=nodes)
 
 
-# Enter interactive mode
-print(
-    """Consider calling `dag` methods such as:
-    - dog.run()
-    """
-)
+# Start an interactive session to run or inspect the DAG dog:
+dog.list()
 code.interact(local=locals(), banner="")
