@@ -1,4 +1,7 @@
-"""A demo dagdog project."""
+"""A demo dagdog project.
+
+Run as: `python demo/project.py`
+"""
 
 import code
 
@@ -20,8 +23,11 @@ nodes = [
 ]
 dog = Dog(nodes=nodes)
 
-# Enter interactive mode
-code.interact(local=locals())
 
-# Consider calling `dag` methods such as:
-dog.run()
+# Enter interactive mode
+print(
+    """Consider calling `dag` methods such as:
+    - dog.run()
+    """
+)
+code.interact(local=locals(), banner="")
