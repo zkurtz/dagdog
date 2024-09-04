@@ -1,0 +1,24 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0  # Use the latest stable version
+  hooks:
+    - id: trailing-whitespace
+    - id: end-of-file-fixer
+    - id: check-yaml
+    - id: check-added-large-files
+
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: v0.0.272   
+  # Use the latest stable version
+  hooks:
+    - id: ruff
+      # args: [ "--fix" ]  # Uncomment to auto-fix issues
+
+- repo: local
+  hooks:
+    - id: pyright
+      name: pyright
+      entry: pyright
+      language: system
+      types: [python]
+      stages: [push]  # Run pyright only on push
