@@ -2,8 +2,9 @@
 venv/
 .venv/
 
-# Pycache
+# cache
 __pycache__/
+.pytest_cache/
 
 # Build artifacts
 dist/

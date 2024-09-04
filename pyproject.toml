@@ -12,17 +12,24 @@ ruff = "^0.6.3"
 pyright = "^1.1.378"
 pytest = "^8.3.2"
 pre-commit = "^3.8.0"
+black = "^24.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
 select = ["E", "F", "I"]
 ignore = []
 
 [tool.pyright]
-include = ["dagdog"]
+include = ["dagdog", "demo"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.black]
+line-length = 120
