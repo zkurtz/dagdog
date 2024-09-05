@@ -19,3 +19,8 @@ class Node:
     def run(self) -> None:
         """Execute the task defined by the node module."""
         self.module.__run__()
+
+    @property
+    def name(self) -> str:
+        """Name of the node, based on the provided module."""
+        return self.module.__name__

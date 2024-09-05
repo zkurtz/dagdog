@@ -21,7 +21,10 @@ nodes = [
     node_2,
     node_3,
 ]
-dog = Dog(nodes=nodes)
+dog = Dog(
+    nodes=nodes,
+    name="demo",
+)
 
 
 # Start an interactive session to run or inspect the DAG dog:
@@ -29,5 +32,5 @@ dog.list()
 # dog("0+")
 # dog("2+")
 # dog("+3")
-# dog("+2")
+dog("+2")
 code.interact(local=locals(), banner="")

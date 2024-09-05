@@ -3,15 +3,17 @@
 import functools
 import re
 from dataclasses import dataclass
+from pathlib import Path
 
 import networkx as nx
 import pandas as pd
 
+from dagdog import state
 from dagdog.nodes import Node
 
 
 def nodes2graph(nodes: list[Node]) -> nx.DiGraph:
-    """Package the nodes as a networkx graph."""
+    """Package a list of nodes as a networkx graph."""
     graph = nx.DiGraph()
     graph.add_nodes_from(node.module for node in nodes)
     edges = []
@@ -37,19 +39,32 @@ class Dog:
     """Container for a dagdog DAG."""
 
     nodes: list[Node]
+    name: str
+    state_dir: Path = Path.home() / ".cache" / "dagdog"
 
     def __post_init__(self) -> None:
         """Validate the input nodes."""
         if not nx.is_directed_acyclic_graph(self.dag):
             raise ValueError("The provided nodes do not form a DAG.")
-        nodes = list(self.dag.nodes())
-        if len(nodes) > len(set(nodes)):
-            raise ValueError("The provided nodes (as indexed by node.module) need to be distinct.")
+        if not self.index["name"].is_unique:
+            raise ValueError("The provided nodes need to be distinct, at least in name.")
+        self.state_dir.mkdir(exist_ok=True, parents=True)
 
     @functools.cached_property
     def dag(self) -> nx.DiGraph:
         """A networkx digraph representation of the DAG."""
         return nodes2graph(self.nodes)
+
+    @property
+    def state(self) -> state.Cache:
+        """The execution state of each node of the DAG."""
+        cache = state.Cache.init(
+            names=list(self.index["name"]),
+            path=self.state_dir / f"{self.name}.json",
+        )
+        if cache.path.is_file():
+            cache.load()
+        return cache
 
     @functools.cached_property
     def index(self) -> pd.DataFrame:
@@ -63,10 +78,10 @@ class Dog:
         modules["parents"] = [list(self.dag.predecessors(idx)) for idx in modules.index]
         # Translate parents back to indices of parents
         df["parents"] = [list(modules["index"].loc[parents]) for parents in modules["parents"]]
-        df["name"] = [module.__name__ for module in sorted_modules]
         # Merge in the raw nodes
         module2node = {node.module: node for node in self.nodes}
         df["node"] = [module2node[module] for module in df["module"]]
+        df["name"] = [node.name for node in df["node"]]
         assert df.index.is_monotonic_increasing, "The index needs to be sorted."
         ret = df[["name", "parents", "node", "module"]]
         assert isinstance(ret, pd.DataFrame), "for pyright"
@@ -90,6 +105,12 @@ class Dog:
             nodes.add(node)
         return self.index.loc[self.index.module.isin(nodes)]
 
+    def _run_node(self, node: Node) -> None:
+        """Execute a node, updating the DAG state before and after execution."""
+        self.state.start(node)
+        node.run()
+        self.state.finish(node)
+
     def __call__(self, select: int | str | None = None, force: bool = False) -> None:
         """Execute nodes of the DAG.
 
@@ -108,13 +129,11 @@ class Dog:
         """
         if select is None:
             for node in self.index.node:
-                node.run()
-            return None
-        if isinstance(select, int):
+                self._run_node(node)
+        elif isinstance(select, int):
             node = self.index.node.loc[int]
-            node.run()
-            return None
-        selection = self.select(select, force=force)
-        for task in selection.itertuples():
-            task.node.run()  # pyright: ignore[reportAttributeAccessIssue]
-        return None
+            self._run_node(node)
+        else:
+            selection = self.select(select, force=force)
+            for row in selection.itertuples():
+                self._run_node(row.node)  # pyright: ignore[reportAttributeAccessIssue]
