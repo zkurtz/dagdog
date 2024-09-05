@@ -9,20 +9,7 @@ import networkx as nx
 import pandas as pd
 
 from dagdog import state
-from dagdog.nodes import Node
-
-
-def nodes2graph(nodes: list[Node]) -> nx.DiGraph:
-    """Package a list of nodes as a networkx graph."""
-    graph = nx.DiGraph()
-    graph.add_nodes_from(node.module for node in nodes)
-    edges = []
-    for node in nodes:
-        for parent in node.parents:
-            edge = (parent.module, node.module)
-            edges.append(edge)
-    graph.add_edges_from(edges)
-    return graph
+from dagdog.nodes import Node, nodes2graph
 
 
 def extract_int_from_selection(str) -> int:

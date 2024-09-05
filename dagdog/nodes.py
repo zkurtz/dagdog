@@ -3,6 +3,8 @@
 from dataclasses import dataclass, field
 from types import ModuleType
 
+import networkx as nx
+
 
 @dataclass
 class Node:
@@ -24,3 +26,16 @@ class Node:
     def name(self) -> str:
         """Name of the node, based on the provided module."""
         return self.module.__name__
+
+
+def nodes2graph(nodes: list[Node]) -> nx.DiGraph:
+    """Package a list of nodes as a networkx graph."""
+    graph = nx.DiGraph()
+    graph.add_nodes_from(node.module for node in nodes)
+    edges = []
+    for node in nodes:
+        for parent in node.parents:
+            edge = (parent.module, node.module)
+            edges.append(edge)
+    graph.add_edges_from(edges)
+    return graph
