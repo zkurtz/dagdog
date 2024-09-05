@@ -39,4 +39,4 @@ if __name__ == "__main__":
     # dog("0+")
     # dog("2+")
     # dog("+3")
-    # dog("+2")
+    # dog("+3", force=True)
