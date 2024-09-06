@@ -1,11 +1,17 @@
+[project]
+name = "dagdog"
+version = "0.1.1"
+description = "A lightweight DAG system for data analysis dev ops"
+readme = "README.md"
+
 [tool.poetry]
 name = "dagdog"
-version = "0.1.0"
+version = "0.1.1"
 description = "A lightweight DAG system for data analysis dev ops"
 authors = ["Zach Kurtz <zkurtz@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.9"
 networkx = "^3.3"
 pandas = "^2.2.2"
 
@@ -17,6 +23,7 @@ pre-commit = "^3.8.0"
 black = "^24.8.0"
 build = "^1.2.1"
 twine = "^5.1.1"
+markdown = "^3.7"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
