@@ -154,7 +154,7 @@ class Dog:
             for node in self.index.node:
                 self._run_node(node)
         elif isinstance(select, int):
-            node = self.index.node.loc[int]
+            node = self.index.node.loc[select]
             self._run_node(node)
         else:
             selection = self.select(select, force=force)
