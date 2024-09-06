@@ -2,9 +2,9 @@
 name = "dagdog"
 version = "0.1.1"
 description = "A lightweight DAG system for data analysis dev ops"
-
-[tool.setuptools.dynamic]
-readme = {file = "README.md", content-type = "text/markdown"}
+dynamic = ["readme", "long_description_content_type"]
+long_description_content_type = "text/markdown"
+readme = "README.md"
 
 [tool.poetry]
 name = "dagdog"
