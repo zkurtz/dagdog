@@ -23,3 +23,7 @@ def test_demo() -> None:
 
     # With force=True, however, a backfill runs all ancestors regardless of run state:
     assert dog.select("+3", force=True).index.to_list() == indices
+
+    # You can also run the whole DAG at once, or an individual step by integer-reference
+    dog()
+    dog(0)
