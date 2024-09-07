@@ -1,11 +1,12 @@
 [tool.poetry]
 name = "dagdog"
-version = "0.1.4"
+version = "0.1.5"
 description = "A lightweight DAG system for data analysis dev ops"
 authors = ["Zach Kurtz <zkurtz@gmail.com>"]
 readme = "README.md"
-long_description = "README.md"
-long_description_content_type = "text/markdown"
+
+[project.urls]
+Source = "https://github.com/zkurtz/dagdog"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

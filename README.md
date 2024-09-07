@@ -8,9 +8,9 @@ Note that this is NOT a replacement for tools like [dagster](https://github.com/
 
 ## Getting started
 
-See the README and demo project inside `/demo`. In brief, here's how to work with `dagdog`:
+See [the demo](https://github.com/zkurtz/dagdog/tree/main/demo). In brief, here's how to work with `dagdog`:
 - Structure your data analysis pipeline as a collection of python modules, with each module defining exactly one task.
-- Within each module, define a `__run__` method. (You might choose to call `__run__` from under `if __name__ == "main":`, but `dagdog` does not care about that and will access `__run__` directly.)
+- Within each module, implement the task using a method named `__run__`, with no arguments. (You might choose to call `__run__` from under `if __name__ == "main":`, but `dagdog` does not care about that and will access `__run__` directly.)
 - Create a project entrypoint script, imitating `demo/project.py` to define the execution order of your tasks.
 - Call your project entrypoint, dropping you into an interactive python session, where you can finally call any of the various execution and introspection methods on the `dog` DAG object.
 
