@@ -19,8 +19,8 @@ See [the demo](https://github.com/zkurtz/dagdog/tree/main/demo). In brief, here'
 
 Create and activate a virtual env for dev ops:
 ```
-git clone git@github.com:zkurtz/packio.git
-cd packio
+git clone git@github.com:zkurtz/dagdog.git
+cd dagdog
 pip install uv
 uv sync
 source .venv/bin/activate
