@@ -17,21 +17,12 @@ See [the demo](https://github.com/zkurtz/dagdog/tree/main/demo). In brief, here'
 
 ## Development
 
-Install [pyenv and its virtualenv plugin](https://github.com/pyenv/pyenv-virtualenv). Then:
 ```
-pyenv install 3.11.4
-pyenv global 3.11.4
-pyenv virtualenv 3.11.4 dagdog
-pyenv activate dagdog
-```
-
-Install poetry:
-```
-curl -sSL https://install.python-poetry.org | python3 -
-```
-
-Set up git hooks:
-```
+git clone git@github.com:zkurtz/dagdog.git
+cd dagdog
+pip install uv
+uv sync
+source .venv/bin/activate
 pre-commit install
 ```
 
