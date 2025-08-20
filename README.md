@@ -14,18 +14,7 @@ See [the demo](https://github.com/zkurtz/dagdog/tree/main/demo). In brief, here'
 - Create a project entrypoint script, imitating `demo/project.py` to define the execution order of your tasks.
 - Call your project entrypoint, dropping you into an interactive python session, where you can finally call any of the various execution and introspection methods on the `dog` DAG object.
 
-
-## Development
-
-Create and activate a virtual env for dev ops:
-```
-git clone git@github.com:zkurtz/dagdog.git
-cd dagdog
-pip install uv
-uv sync
-source .venv/bin/activate
-pre-commit install
-```
+If working directly on this repo, consider using the [simplest-possible virtual environment](https://gist.github.com/zkurtz/4c61572b03e667a7596a607706463543).
 
 ## Design goals
 

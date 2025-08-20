@@ -1,6 +1,6 @@
 [project]
 name = "dagdog"
-version = "0.1.5"
+version = "0.1.6"
 description = "A lightweight DAG system for data analysis dev ops"
 authors = [{ name = "Zach Kurtz", email = "zkurtz@gmail.com" }]
 readme = "README.md"
@@ -19,6 +19,7 @@ dev = [
   "pyright >=1.1.378",
   "ruff >=0.6.3",
   "pytest >=8.3.2",
+  "click>=8.2.1",
 ]
 
 [project.urls]
