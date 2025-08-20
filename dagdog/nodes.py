@@ -2,8 +2,16 @@
 
 from dataclasses import dataclass, field
 from types import ModuleType
+from typing import Callable
 
 import networkx as nx
+
+
+def is_click_command(func: Callable) -> bool:
+    """Check if a function is decorated with @click.command."""
+    class_name = func.__class__.__name__
+    module_name = getattr(func.__class__, "__module__", "")
+    return class_name in ("Command", "Group") and "click" in module_name
 
 
 @dataclass
@@ -18,9 +26,21 @@ class Node:
     module: ModuleType
     parents: list["Node"] = field(default_factory=list)
 
+    def __post_init__(self) -> None:
+        """Validate node attributes."""
+        if is_click_command(self.run_method):
+            do_not = "Remove the `@click.command()` decorator from the node module's `__run__` method."
+            instead_do = "Instead, see https://gist.github.com/zkurtz/84e3158ed3fb618e338ce581bbe18912"
+            raise ValueError(f"{do_not} {instead_do}")
+
+    @property
+    def run_method(self) -> Callable:
+        """Return the run method of the node module."""
+        return self.module.__run__
+
     def run(self) -> None:
         """Execute the task defined by the node module."""
-        self.module.__run__()
+        self.run_method()
 
     @property
     def name(self) -> str:
