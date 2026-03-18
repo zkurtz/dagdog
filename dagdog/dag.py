@@ -126,6 +126,63 @@ class Dog:
             nodes = self.prune(nodes)  # pyright: ignore[reportArgumentType]
         return self.index.loc[self.index.module.isin(nodes)]
 
+    def refresh(self, max_hours: float = 24) -> None:
+        """Run only the nodes needed to bring the entire DAG to a valid, up-to-date state.
+
+        A node is considered stale (and will be re-run) if any of the following apply:
+        - It has never successfully run.
+        - It is a root node (no parents) whose last run finished more than `max_hours` ago.
+        - Any of its ancestors is stale.
+        - Its start timestamp precedes the finish timestamp of an ancestor (ordering violation).
+
+        Args:
+            max_hours: Root nodes that finished more than this many hours ago are treated as stale.
+        """
+        current_state = self.state
+        max_age_ns = int(max_hours * 3600 * 1e9)
+        now_ns = state.timestamp()
+        stale: set[ModuleType] = set()
+
+        # Process nodes in topological order so ancestor staleness propagates correctly
+        for row in self.index.itertuples():
+            module = row.module  # pyright: ignore[reportAttributeAccessIssue]
+            name = row.name  # pyright: ignore[reportAttributeAccessIssue]
+            node_state = current_state.nodes[name]
+
+            # Node has never successfully run
+            if node_state.finish_ns is None or node_state.start_ns is None:
+                stale.add(module)
+                continue
+
+            # Root nodes (no parents): check recency; skip ancestor checks (there are none)
+            if self.dag.in_degree(module) == 0:
+                if now_ns - node_state.finish_ns > max_age_ns:
+                    stale.add(module)
+                continue
+
+            # Any ancestor is stale → this node is also stale (propagation)
+            ancestor_modules = nx.ancestors(self.dag, module)
+            if ancestor_modules & stale:
+                stale.add(module)
+                continue
+
+            # Ordering: node must have started after all ancestors finished
+            ancestor_names = list(self.index.loc[self.index.module.isin(ancestor_modules), "name"])
+            ancestor_finish_times = [current_state.nodes[n].finish_ns for n in ancestor_names]
+            if any(t is None for t in ancestor_finish_times):
+                stale.add(module)
+                continue
+            if max(ancestor_finish_times) > node_state.start_ns:  # pyright: ignore[reportArgumentType]
+                stale.add(module)
+
+        if not stale:
+            print("All nodes are up to date.")
+            return
+        to_run = self.index.loc[self.index.module.isin(stale)]
+        print(f"Refreshing the following tasks: {to_run['name'].to_list()}")
+        for row in to_run.itertuples():
+            self._run_node(row.node)  # pyright: ignore[reportAttributeAccessIssue]
+
     def _run_node(self, node: Node) -> None:
         """Execute a node, updating the DAG state before and after execution."""
         print(f"\nStarting execution of task {node.name}")
