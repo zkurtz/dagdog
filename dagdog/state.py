@@ -70,12 +70,12 @@ class Cache:
         """Delete the cache."""
         self.path.unlink(missing_ok=True)
 
-    def start(self, node: nodes.Node) -> None:  # pyright: ignore[reportInvalidTypeForm]
+    def start(self, node: nodes.Node) -> None:
         """Update cache to reflect that `node` execution has begun."""
         self.nodes[node.name] = NodeState(start_ns=timestamp())
         self.save()
 
-    def finish(self, node: nodes.Node) -> None:  # pyright: ignore[reportInvalidTypeForm]
+    def finish(self, node: nodes.Node) -> None:
         """Update cache to reflect that `node` execution has finished."""
         self.nodes[node.name] = NodeState(
             start_ns=self.nodes[node.name].start_ns,

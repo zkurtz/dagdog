@@ -8,11 +8,11 @@ repos:
     - id: check-added-large-files
 - repo: local
   hooks:
-    - id: pyright
-      name: type checking (pyright)
-      entry: pyright
+    - id: ty
+      name: type checking (ty)
+      entry: ty check
       language: system
-      types: [python]
+      pass_filenames: false
     - id: ruff-format
       name: formatting (ruff)
       entry: ruff

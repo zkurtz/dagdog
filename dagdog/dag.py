@@ -103,7 +103,7 @@ class Dog:
             ancestors_finish_ts = [self.state.nodes[name].finish_ns for name in ancestor_names]
             if any(item is None for item in ancestors_finish_ts):
                 continue  # an ancestor has not run
-            if max(ancestors_finish_ts) > state.start_ns:  # pyright: ignore[reportArgumentType]
+            if max(ancestors_finish_ts) > state.start_ns:
                 continue  # ancestors ran more recently than the current node
             # Otherwise, we can prune out this node
             keepers.remove(name)
@@ -123,7 +123,7 @@ class Dog:
         if "(" not in selection:
             nodes.add(node)
         if is_backfill and not force:
-            nodes = self.prune(nodes)  # pyright: ignore[reportArgumentType]
+            nodes = self.prune(nodes)  # type: ignore[reportArgumentType]
         return self.index.loc[self.index.module.isin(nodes)]
 
     def refresh(self, max_hours: float = 24) -> None:
@@ -132,8 +132,8 @@ class Dog:
         A node is considered stale (and will be re-run) if any of the following apply:
         - It has never successfully run.
         - It is a root node (no parents) whose last run finished more than `max_hours` ago.
-        - Any of its ancestors is stale.
-        - Its start timestamp precedes the finish timestamp of an ancestor (ordering violation).
+        - Any parent is stale (which transitively covers all ancestors).
+        - Its start timestamp precedes the finish timestamp of a parent (ordering violation).
 
         Args:
             max_hours: Root nodes that finished more than this many hours ago are treated as stale.
@@ -143,36 +143,31 @@ class Dog:
         now_ns = state.timestamp()
         stale: set[ModuleType] = set()
 
-        # Process nodes in topological order so ancestor staleness propagates correctly
+        # Process nodes in topological order so staleness propagates correctly via parents
         for row in self.index.itertuples():
-            module = row.module  # pyright: ignore[reportAttributeAccessIssue]
-            name = row.name  # pyright: ignore[reportAttributeAccessIssue]
+            module = row.module  # type: ignore[reportAttributeAccessIssue]
+            name = row.name  # type: ignore[reportAttributeAccessIssue]
             node_state = current_state.nodes[name]
 
-            # Node has never successfully run
             if node_state.finish_ns is None or node_state.start_ns is None:
                 stale.add(module)
                 continue
 
-            # Root nodes (no parents): check recency; skip ancestor checks (there are none)
-            if self.dag.in_degree(module) == 0:
+            parents = set(self.dag.predecessors(module))
+            if not parents:
+                # Root node: check recency
                 if now_ns - node_state.finish_ns > max_age_ns:
                     stale.add(module)
                 continue
 
-            # Any ancestor is stale → this node is also stale (propagation)
-            ancestor_modules = nx.ancestors(self.dag, module)
-            if ancestor_modules & stale:
+            if parents & stale:
                 stale.add(module)
                 continue
 
-            # Ordering: node must have started after all ancestors finished
-            ancestor_names = list(self.index.loc[self.index.module.isin(ancestor_modules), "name"])
-            ancestor_finish_times = [current_state.nodes[n].finish_ns for n in ancestor_names]
-            if any(t is None for t in ancestor_finish_times):
-                stale.add(module)
-                continue
-            if max(ancestor_finish_times) > node_state.start_ns:  # pyright: ignore[reportArgumentType]
+            # Ordering: node must have started after all parents finished
+            parent_names = self.index.loc[self.index.module.isin(parents), "name"]
+            parent_finish_times = [current_state.nodes[n].finish_ns for n in parent_names]
+            if max(parent_finish_times) > node_state.start_ns:
                 stale.add(module)
 
         if not stale:
@@ -181,7 +176,7 @@ class Dog:
         to_run = self.index.loc[self.index.module.isin(stale)]
         print(f"Refreshing the following tasks: {to_run['name'].to_list()}")
         for row in to_run.itertuples():
-            self._run_node(row.node)  # pyright: ignore[reportAttributeAccessIssue]
+            self._run_node(row.node)
 
     def _run_node(self, node: Node) -> None:
         """Execute a node, updating the DAG state before and after execution."""
@@ -217,4 +212,4 @@ class Dog:
             selection = self.select(select, force=force)
             print(f"Starting executing of the following tasks: {selection.name}")
             for row in selection.itertuples():
-                self._run_node(row.node)  # pyright: ignore[reportAttributeAccessIssue]
+                self._run_node(row.node)  # type: ignore[reportAttributeAccessIssue]
