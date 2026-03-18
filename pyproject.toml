@@ -1,6 +1,6 @@
 [project]
 name = "dagdog"
-version = "0.1.6"
+version = "0.1.7"
 description = "A lightweight DAG system for data analysis dev ops"
 authors = [{ name = "Zach Kurtz", email = "zkurtz@gmail.com" }]
 readme = "README.md"
@@ -16,7 +16,7 @@ packages = ["dagdog", "demo"]
 [dependency-groups]
 dev = [
   "pre-commit >=3.8.0",
-  "pyright >=1.1.378",
+  "ty >=0.0.1a7",
   "ruff >=0.6.3",
   "pytest >=8.3.2",
   "click>=8.2.1",
@@ -30,9 +30,6 @@ package = true
 
 [tool.ruff]
 line-length = 120
-
-[tool.pyright]
-include = ["dagdog", "tests"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
